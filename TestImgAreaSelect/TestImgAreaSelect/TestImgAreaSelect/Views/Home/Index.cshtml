@@ -1,0 +1,199 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@section styles{
+
+
+    <link href="~/Plugin/modal/modal.css?@Guid.NewGuid().ToString()" rel="stylesheet" />
+
+    <style>
+        .lbl-image-upload {
+        }
+
+            .lbl-image-upload:hover {
+                color: blue;
+                cursor: pointer;
+            }
+
+
+            .lbl-image-upload > input[type=file] {
+                display: none;
+            }
+
+
+        .modal-tempImg {
+        }
+
+        #target-img {
+            min-width: 200px;
+            min-height: 200px;
+        }
+    </style>
+
+}
+
+
+<h2>Index</h2>
+
+<img id="target-img" src="~/images/phpPSXnKG.jpg" />
+
+
+<hr />
+
+<!-- Trigger/Open The Modal -->
+<button id="myBtn" data-target="myModal" class="modal-open">Open Modal</button>
+
+<div id="myModal" class="modal">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Modal Header</h2>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+
+            <div class="col-lg-12" style="text-align:center">
+
+                <label class="lbl-image-upload btn btn-primary">
+                    圖片上傳
+                    <input type="file" class="upload-file" />
+                </label>
+                <button class="btn btn-default btn-image-submit">確認</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+@*<a href="~/images/phpPSXnKG.jpg" data-lightbox="image-1" data-title="My caption">Image #1</a>*@
+
+@section scripts{
+    <script src="~/Plugin/modal/modal.js?@Guid.NewGuid().ToString()"></script>
+
+
+    <script>
+
+
+        $(function () {
+            $('#myBtn').setImgModal({
+                uploadUrl: '@Url.Action("ImageUpload")',
+                targetImg: $('#target-img')
+            });
+        });
+
+        (function ($) {
+            $.fn.extend({
+                setImgModal: function (option) {
+                    var me = $(this);
+
+                    if ($(this).hasClass('modal-open')) {
+                        var opt = $.extend(true, {
+                            uploadUrl: '',
+                            targetImg: '',
+
+                        }, option);
+                    }
+
+                  
+
+                    me.data('option', opt);
+                    setImgModal(me);
+                },
+
+            });
+
+
+
+        //設定Modal
+          var setImgModal = function (btn) {
+              var modal = btn.getModal();
+              var opt = btn.getOption();
+            /*
+             檔案AJAX上傳
+             */
+            var fileupload = modal.find('.upload-file');
+
+            fileupload.on('change', function (e) {
+                var files = this.files;
+                var formdata = new FormData();
+                formdata.append('Image', files[0]);
+          
+                    fileUpload(formdata, opt.uploadUrl, function (result) {
+                    var tempImg = modal.find('.modal-tempImg');
+                    tempImg.attr('src', result + '?' + new Date().getTime());
+                });
+            });
+
+            var btnSubmit = modal.find('.btn-image-submit');
+            /*
+            確認暫存並回頁面
+            */
+            btnSubmit.on('click', function () {
+
+                var targetImg = opt.targetImg;
+
+                var tempImg = modal.find('.modal-tempImg');
+
+                targetImg[0].src = tempImg[0].src;
+
+                modal.css('display','none');
+
+            });
+
+              //設定開啟Modal時的點擊事件
+            opt.OnOpen = function (e) {
+
+                var modal = btn.getModal();
+                var modalContent = modal.find('.modal-body');
+
+
+                var tempImg = $('<img>');
+
+                if (opt.targetImg.length) {
+                    tempImg = opt.targetImg.clone();
+                    tempImg[0].id = '';
+
+                }
+
+                tempImg.addClass('modal-tempImg');
+                tempImg.appendTo(modalContent);
+
+
+            }
+            btn.setDefaultModal();
+
+        };
+
+          var fileUpload = function (formdata, Url,successFunc) {
+              $.ajax({
+                  url: Url,
+                  type: 'post',
+                  processData: false,  // tell jQuery not to process the data 重要
+                  contentType: false,  // tell jQuery not to set contentType 重要
+                  data: formdata,
+                  dataType: 'json',
+                  success: function (result) {
+                      if (typeof successFunc =='function'){
+                          successFunc(result);
+                      }
+                  }
+
+              });
+
+          }
+
+
+        })(jQuery);
+    </script>
+
+}

@@ -8,42 +8,35 @@
                 var modal = getModal(me);
                 var opt = getOption(me);
                 if (modal.length) {
-
-                    var span = modal.find('.close');
-
+                    //1
                     me.on('click', function () {
                         openModal(modal, opt.OnOpen)
-
                     });
 
+                    //2
+                    var span = modal.find('.close');
                     span.on('click', function () {
 
                         closeModal(modal);
                     });
 
+                    //3
                     $(window).on('click', function (event) {
-                            if (event.target == modal[0]) {
-                                closeModal(modal);
-                            }
-                      
+                        if (event.target == modal[0]) {
+                            closeModal(modal);
+                        }
                     });
 
-                
+                    //4
+                    var btnSubmit = modal.find('.modal-submit');
+                    btnSubmit.on('click', function () {
+                        submitModal(modal, opt.OnSubmit)
+                    });
 
                 }
 
             }
 
-        },
-
-        submit: function (modal,func) {
-            var me = $(this);
-            if (me.hasClass('modal-submit')) {
-                if (func && typeof func == 'function') {
-                    func();
-                    closeModal(modal);
-                }
-            } 
         },
 
         getModal: function () {
@@ -67,6 +60,8 @@
 
     });
 
+    ////////////////////////////////////////////////////////////////////
+
 
     var getModal = function (btn) {
         var targetModalId = btn.data('target');
@@ -83,19 +78,28 @@
     };
 
     var closeModal = function (modal) {
-      
+
         var modalContent = modal.find('.modal-body');
         modalContent.empty();
         modal.css('display', "none");
-    
+
     };
 
-    var openModal = function (modal,func) {
+    var openModal = function (modal, func) {
         modal.css('display', "block");
         if (func && typeof func == 'function') {
             func();
         }
 
+    }
+
+    var submitModal = function (modal, func) {
+     
+        if (func && typeof func == 'function') {
+            func();
+        }
+
+        closeModal(modal);
     }
 
 })(jQuery);

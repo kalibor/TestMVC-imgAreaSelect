@@ -38,7 +38,7 @@
 
 <h2>Index</h2>
 
-<img id="target-img" src="~/images/phpPSXnKG.jpg" />
+<img id="target-img" style="width:400px;height:400px;" src="~/images/phpPSXnKG.jpg?w" />
 
 
 <hr />
@@ -81,136 +81,28 @@
 @section scripts{
     <script src="~/Plugin/jquery.imgareaselect-0.9.10/scripts/jquery.imgareaselect.pack.js"></script>
     <script src="~/Plugin/jquery.imgareaselect-0.9.10/scripts/jquery.imgareaselect.min.js"></script>
-  
-    <script src="~/Plugin/modal/modal.js?@Guid.NewGuid().ToString()"></script>
 
+    <script src="~/Plugin/modal/modal.js?@Guid.NewGuid().ToString()"></script>
+<script src="~/Plugin/modal/imgmodal.js?@Guid.NewGuid().ToString()"></script>
 
     <script>
 
 
         $(function () {
+
+            //imgmodal.js
             $('#myBtn').setImgModal({
                 uploadUrl: '@Url.Action("ImageUpload")',
-                targetImg: $('#target-img')
+                cropUploadUrl:'@Url.Action("CropImageUpload")',
+                targetImg: $('#target-img'),
+                imgAreaSelectSetting: {},
+                submitCallback: function (resultUrl) {
+                    console.log(resultUrl);
+                },
             });
         });
 
-        (function ($) {
-            $.fn.extend({
-                setImgModal: function (option) {
-                    var me = $(this);
-
-                    if ($(this).hasClass('modal-open')) {
-                        var opt = $.extend(true, {
-                            uploadUrl: '',
-                            targetImg: '',
-
-                        }, option);
-                    }
-
-
-
-                    me.data('option', opt);
-                    setImgModal(me);
-                },
-
-            });
-
-
-
-        //設定Modal
-          var setImgModal = function (btn) {
-              var modal = btn.getModal();
-              var opt = btn.getOption();
-            /*
-             檔案AJAX上傳
-             */
-            var fileupload = modal.find('.upload-file');
-
-            fileupload.on('change', function (e) {
-                var files = this.files;
-                var formdata = new FormData();
-                formdata.append('Image', files[0]);
-
-                    fileUpload(formdata, opt.uploadUrl, function (result) {
-                    var tempImg = modal.find('.modal-tempImg');
-                    tempImg.attr('src', result + '?' + new Date().getTime());
-                });
-            });
-
-            var btnSubmit = modal.find('.modal-submit');
-            /*
-            確認暫存並回頁面
-            */
-        
-            btnSubmit.on('click', function () {
-                var me = $(this);
-             
-                me.submit(modal,function () {
-                    var targetImg = opt.targetImg;
-                    var tempImg = modal.find('.modal-tempImg');
-                    targetImg[0].src = tempImg[0].src;
-                });
      
-
-
-            });
-
-              //設定開啟Modal時的點擊事件
-            opt.OnOpen = function (e) {
-
-                var modal = btn.getModal();
-                var modalContent = modal.find('.modal-body');
-
-
-                var tempImg = $('<img>');
-
-                if (opt.targetImg.length) {
-                    tempImg = opt.targetImg.clone();
-                    tempImg[0].id = '';
-
-                }
-
-                tempImg.addClass('modal-tempImg');
-                tempImg.appendTo(modalContent);
-                loadImgAreaSelectSetting(tempImg);
-
-            }
-            btn.setDefaultModal();
-
-        };
-
-          var fileUpload = function (formdata, Url,successFunc) {
-              $.ajax({
-                  url: Url,
-                  type: 'post',
-                  processData: false,  // tell jQuery not to process the data 重要
-                  contentType: false,  // tell jQuery not to set contentType 重要
-                  data: formdata,
-                  dataType: 'json',
-                  success: function (result) {
-                      if (typeof successFunc =='function'){
-                          successFunc(result);
-                      }
-                  }
-
-              });
-
-          }
-
-          var loadImgAreaSelectSetting = function (img) {
-    
-              img.imgAreaSelect({
-                  parent: img.parent()[0],
-            
-                  handles: true,
-                  onSelectEnd: function (position) { console.log(position) }
-              });
-            
-          }
-
-
-        })(jQuery);
     </script>
 
 }
